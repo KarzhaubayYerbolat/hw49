@@ -12,7 +12,8 @@ class AppUser(AbstractUser):
         on_delete=models.PROTECT,
         verbose_name='Team',
         null=True,
-        related_name='users'
+        related_name='users',
+        blank=True,
     )
 
 
@@ -22,5 +23,10 @@ class Team(models.Model):
         'appuser.AppUser',
         on_delete=models.PROTECT,
         verbose_name='Team leader',
-        related_name='leading_team'
+        related_name='leading_team',
+        null=True,
+        blank=True,
     )
+
+    def  __str__(self):
+        return self.title
