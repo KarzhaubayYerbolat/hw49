@@ -1,3 +1,16 @@
 from django.contrib import admin
+from .models import *
 
-# Register your models here.
+
+class TaskSolutionInline(admin.StackedInline):
+    model = Solution
+
+
+class TaskAdmin(admin.ModelAdmin):
+    list_display = ('title', 'task_type', 'status', 'initiator', 'responsible_group', 'executor')
+    inlines = (TaskSolutionInline,)
+
+
+admin.site.register(Task, TaskAdmin)
+admin.site.register(Status)
+admin.site.register(TaskType)

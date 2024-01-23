@@ -39,16 +39,16 @@ class Task(ReturnTitleStrMixin, models.Model):
         verbose_name='Executor',
         related_name='tasks_executed'
     )
-    solution = models.OneToOneField(
-        'webapp.Solution',
-        on_delete=models.SET_NULL,
-        null=True,
-        verbose_name='Task Solution',
-        related_name='task'
-    )
 
 
 class Solution(models.Model):
+    task = models.OneToOneField(
+        'webapp.Task',
+        on_delete=models.CASCADE,
+        verbose_name='Linked Task',
+        related_name='solution',
+        null=True,
+    )
     solution_description = models.TextField(verbose_name='Solution')
 
     def __str__(self):
