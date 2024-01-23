@@ -7,7 +7,7 @@ class Task(ReturnTitleStrMixin, models.Model):
     description = models.TextField(verbose_name='Description')
     create_datetime = models.DateTimeField(auto_now_add=True, verbose_name='Create datetime')
     last_update = models.DateTimeField(auto_now=True, verbose_name='Last update')
-    complete_datetime = models.DateTimeField(verbose_name='Complete datetime')
+    complete_datetime = models.DateTimeField(verbose_name='Complete datetime', null=True, blank=True)
     status = models.ForeignKey(
         'webapp.Status',
         on_delete=models.PROTECT,
@@ -27,7 +27,7 @@ class Task(ReturnTitleStrMixin, models.Model):
         related_name='tasks_initiated',
     )
     responsible_group = models.ForeignKey(
-        'auth.Group',
+        'appuser.Team',
         on_delete=models.PROTECT,
         verbose_name='Responsible Group',
         related_name='tasks_with_responsible_group'
@@ -37,7 +37,8 @@ class Task(ReturnTitleStrMixin, models.Model):
         on_delete=models.PROTECT,
         null=True,
         verbose_name='Executor',
-        related_name='tasks_executed'
+        related_name='tasks_executed',
+        blank=True
     )
 
 
