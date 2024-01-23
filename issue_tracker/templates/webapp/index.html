@@ -1,0 +1,88 @@
+{% extends '../base.html' %}
+{% block content %}
+<div class="explorer px-4 py-1">
+  <div class="filter-links-block">
+    <strong>
+    <a href="{% url 'task_list' %}" class="filter-link"><i class="fa-solid fa-list me-1"></i>All tasks</a>
+    </strong>
+    {{request.user.responsible_group.title}}
+    <strong>
+      <a href="{% url 'task_list' %}?team={{ request.user.team.title|urlencode  }}" class="filter-link"><i class="fa-solid fa-users me-1"></i>Your team tasks</a>
+    </strong>
+    <strong>
+      <a href="{% url 'task_list' %}?executor={{ request.user.username|urlencode  }}" class="filter-link"><i class="fa-solid fa-user me-1"></i>You executor</a>
+    </strong>
+    <strong>
+      <a href="{% url 'task_list' %}?initiator={{ request.user.username|urlencode  }}" class="filter-link"><i class="fa-solid fa-user me-1"></i>You initiator</a>
+    </strong>
+  </div>
+  <div class="new-task-link">
+    <i class="fa-solid fa-plus"></i>
+    <strong>
+      <a href="#">New task</a>
+    </strong>
+  </div>
+</div>
+<div class="card mask-custom rounded-0">
+  <div class="card-body text-white p-0">
+    <table class="table text-white mb-0">
+      <thead>
+        <tr>
+          <th scope="col">Initiator</th>
+          <th scope="col">Title</th>
+          <th scope="col">Type</th>
+          <th scope="col">Status</th>
+          <th scope="col">Group</th>
+          <th scope="col">Executor</th>
+          <th scope="col">Create date</th>
+          <th scope="col">Last update</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for task in tasks %}
+        <tr class="fw-normal">
+          <th>
+            <span>{{ task.initiator }}</span>
+          </th>
+          <td class="align-middle">
+            <span>{{ task.title }}</span>
+          </td>
+          <td class="align-middle">
+            <span>{{ task.task_type }}</span>
+          </td>
+          <td class="align-middle">
+            <span>{{ task.status }}</span>
+          </td>
+          <td class="align-middle">
+            <span>{{ task.responsible_group }}</span>
+          </td>
+          <td class="align-middle">
+            {% if task.executor %}
+              <span>{{ task.executor }}</span>
+            {% else %}
+              <span>not assigned</span>
+            {% endif %}
+          </td>
+          <td class="align-middle">
+            <span>{{ task.create_datetime|date:'d.m.Y H:i' }}</span>
+          </td>
+          <td class="align-middle">
+            <span>{{ task.last_update|date:'d.m.Y H:i' }}</span>
+          </td>
+          <td class="align-middle">
+            <a href="#!" data-mdb-toggle="tooltip" title="Done"><i
+                class="fas fa-check fa-lg text-success me-3"></i></a>
+            <a href="#!" data-mdb-toggle="tooltip" title="Remove"><i
+                class="fas fa-trash-alt fa-lg text-warning"></i></a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+
+{% endblock %}

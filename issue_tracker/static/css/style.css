@@ -1,0 +1,33 @@
+.custom-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #3b3636;
+    padding: 5px 15px;
+    color: white;
+}
+
+.logo-link {
+    text-decoration: none;
+    color: white;
+}
+
+.explorer {
+    background: #68ffd5;
+}
+
+.filter-link {
+    padding-right: 30px;
+}
+
+.explorer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: black;
+}
+
+.explorer a {
+    color: black;
+    text-decoration: none;
+}
