@@ -2,7 +2,7 @@
 {% block content %}
 <div class="content border border-2">
     <div class="block-form w-50 mx-auto my-0">
-        <form action="{% url 'create_task' %}" method="post" class="task-create text-center">
+        <form action="{{ form_action }}" method="post" class="task-create text-center">
             {% csrf_token %}
             {% for field in form %}
             <div class="form-group my-2">
@@ -21,7 +21,7 @@
                 {% endif %}
                 {% endfor %}
             </div>
-            <button type="submit" class="btn btn-primary my-3">Create Task</button>
+            <button type="submit" class="btn btn-primary my-3">{{ button_action }}</button>
         </form>
     </div>
 </div>

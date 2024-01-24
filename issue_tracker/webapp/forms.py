@@ -5,7 +5,7 @@ from .models import Task, TaskType
 from appuser.models import Team
 
 
-class TaskCreateForm(forms.ModelForm):
+class TaskCreateOrUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Task

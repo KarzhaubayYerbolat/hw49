@@ -54,7 +54,7 @@
               {% csrf_token %}
               <button type="submit" class="btn btn-warning shadow-0">Reject Task</button>
           </form>
-          <a href="#" class="btn btn-secondary shadow-0">Edit task</a>
+          <a href="{% url 'edit_task' task.id %}" class="btn btn-secondary shadow-0">Edit task</a>
       </div>
 </div>
 

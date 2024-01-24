@@ -1,16 +1,15 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views import View
 from django.views.generic import TemplateView
 from .models import Task, Status
-from .forms import TaskCreateForm
+from .forms import TaskCreateOrUpdateForm
 
 
 class TaskListView(TemplateView):
     template_name = 'webapp/index.html'
 
     def get_context_data(self, **kwargs):
-
         context = super(TaskListView, self).get_context_data(**kwargs)
         context['tasks'] = self.get_queryset()
         context['page_title'] = 'Task List'
@@ -43,15 +42,16 @@ class TaskDetailView(TemplateView):
 
 
 class TaskCreateView(View):
-    template = 'webapp/create_task.html'
+    template = 'webapp/create_or_update_task.html'
+    context = {'form_action': '/tasks/new/', 'button_action': 'Create'}
 
     def get(self, request):
-        form = TaskCreateForm()
-        context = {'form': form}
-        return render(request, self.template, context)
+        form = TaskCreateOrUpdateForm()
+        self.context['form'] = form
+        return render(request, self.template, self.context)
 
     def post(self, request):
-        form = TaskCreateForm(request.POST)
+        form = TaskCreateOrUpdateForm(request.POST)
 
         if form.is_valid():
             obj = form.save(commit=False)
@@ -61,5 +61,28 @@ class TaskCreateView(View):
             return redirect(reverse('task_detail', kwargs={'task_id': obj.id}))
 
         else:
-            context = {'form': form}
-            return render(request, self.template, context)
+            self.context['form'] = form
+            return render(request, self.template, self.context)
+
+
+class TaskUpdateView(View):
+    template = 'webapp/create_or_update_task.html'
+    context = {'button_action': 'Update'}
+
+    def get(self, request, task_id):
+        task = get_object_or_404(Task, id=task_id)
+        form = TaskCreateOrUpdateForm(instance=task)
+        self.context['form'] = form
+        self.context['form_action'] = f'/tasks/edit/{task.id}'
+        return render(request, self.template, self.context)
+
+    def post(self, request, task_id):
+        task = get_object_or_404(Task, id=task_id)
+        form = TaskCreateOrUpdateForm(request.POST, instance=task)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('task_detail', kwargs={'task_id': task.id}))
+
+        else:
+            self.context['form'] = form
+            return render(request, self.template, self.context)
