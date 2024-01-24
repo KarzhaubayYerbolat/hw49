@@ -13,6 +13,7 @@ class Task(ReturnTitleStrMixin, models.Model):
         on_delete=models.PROTECT,
         verbose_name='Status',
         related_name='tasks_with_status',
+
     )
     task_type = models.ForeignKey(
         'webapp.TaskType',

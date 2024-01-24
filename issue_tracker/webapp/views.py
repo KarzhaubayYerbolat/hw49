@@ -1,5 +1,9 @@
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from django.views import View
 from django.views.generic import TemplateView
-from .models import Task
+from .models import Task, Status
+from .forms import TaskCreateForm
 
 
 class TaskListView(TemplateView):
@@ -24,7 +28,7 @@ class TaskListView(TemplateView):
             queryset = model.objects.filter(executor__username=executor_filter)
         if initiator_filter:
             queryset = model.objects.filter(initiator__username=initiator_filter)
-        return queryset
+        return queryset.order_by('-create_datetime')
 
 
 class TaskDetailView(TemplateView):
@@ -38,3 +42,24 @@ class TaskDetailView(TemplateView):
         return context
 
 
+class TaskCreateView(View):
+    template = 'webapp/create_task.html'
+
+    def get(self, request):
+        form = TaskCreateForm()
+        context = {'form': form}
+        return render(request, self.template, context)
+
+    def post(self, request):
+        form = TaskCreateForm(request.POST)
+
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.initiator = self.request.user
+            obj.status = Status.objects.get(title='New')
+            obj.save()
+            return redirect(reverse('task_detail', kwargs={'task_id': obj.id}))
+
+        else:
+            context = {'form': form}
+            return render(request, self.template, context)
