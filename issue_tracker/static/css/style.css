@@ -40,3 +40,7 @@
 .block-task-forms form {
     margin-right: 15px;
 }
+
+.logout-link {
+    color: red;
+}

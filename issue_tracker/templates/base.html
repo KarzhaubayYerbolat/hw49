@@ -19,6 +19,14 @@
             <div class="nav-user-block">
                 <span class="username">{{ request.user.username }}</span>
                 <i class="fa-solid fa-user"></i>
+                {% if request.user.is_authenticated %}
+                <form action="{% url 'logout' %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button class="nav-link logout-link" type="submit">Logout</button>
+                </form>
+                {% else %}
+                <a href="{% url 'loginuser' %}">Login</a>
+                {% endif %}
             </div>
         </div>
     {% block content %}
