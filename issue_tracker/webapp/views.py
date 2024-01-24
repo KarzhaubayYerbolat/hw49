@@ -25,3 +25,16 @@ class TaskListView(TemplateView):
         if initiator_filter:
             queryset = model.objects.filter(initiator__username=initiator_filter)
         return queryset
+
+
+class TaskDetailView(TemplateView):
+    template_name = 'webapp/task_detail.html'
+
+    def get_context_data(self, task_id, **kwargs):
+        context = super(TaskDetailView, self).get_context_data(**kwargs)
+        task = Task.objects.get(id=task_id)
+        context['task'] = task
+        context['page_title'] = f'Task-{task_id} {task.title}'
+        return context
+
+

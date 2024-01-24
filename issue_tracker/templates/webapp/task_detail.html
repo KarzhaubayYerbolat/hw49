@@ -1,0 +1,65 @@
+{% extends '../base.html' %}
+{% block content %}
+    <div class="border p-3">
+          <h4 class="title text-dark text-center">
+              <span class="task-title-key">
+                  Title:
+              </span>
+              <span class="task-title-value">
+                  {{ task.title }}
+              </span>
+
+          </h4>
+          <p>
+              <span class="task-title-key">
+                  Description:
+              </span>
+              <span class="task-title-value">
+                  {{ task.description }}
+              </span>
+          </p>
+
+          <div class="row">
+            <dt class="col-3">Initiator:</dt>
+            <dd class="col-9">{{ task.initiator }}</dd>
+
+            <dt class="col-3">Type:</dt>
+            <dd class="col-9">{{ task.task_type }}</dd>
+
+            <dt class="col-3">Status:</dt>
+            <dd class="col-9">{{ task.status }}</dd>
+
+            <dt class="col-3">Responsible Group:</dt>
+            <dd class="col-9">{{ task.responsible_group }}</dd>
+
+            <dt class="col-3">Executor:</dt>
+            {% if task.executor %}
+                <dd class="col-9">{{ task.executor }}</dd>
+            {% else %}
+                <dd class="col-9">Not assigned</dd>
+            {% endif %}
+            <dt class="col-3">Create:</dt>
+            <dd class="col-9">{{ task.create_datetime|date:'d.m.Y H:i' }}</dd>
+            <dt class="col-3">Last Update:</dt>
+            <dd class="col-9">{{ task.last_update|date:'d.m.Y H:i' }}</dd>
+          </div>
+          <div class="block-task-forms mt-3">
+              <form action="#" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary shadow-0">Take Task</button>
+              </form>
+              <form action="#" method="post">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger shadow-0">Delete Task</button>
+              </form>
+              <form action="#" method="post">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-warning shadow-0">Reject Task</button>
+              </form>
+              <a href="#" class="btn btn-secondary shadow-0">Edit task</a>
+          </div>
+
+
+    </div>
+
+{% endblock %}

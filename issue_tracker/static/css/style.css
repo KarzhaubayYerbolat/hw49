@@ -31,3 +31,12 @@
     color: black;
     text-decoration: none;
 }
+
+.block-task-forms {
+    display: flex;
+    justify-content: center;
+}
+
+.block-task-forms form {
+    margin-right: 15px;
+}
