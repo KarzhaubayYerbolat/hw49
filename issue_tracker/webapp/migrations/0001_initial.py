@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=30, verbose_name='Status')),
             ],
-            bases=(webapp.utils.ReturnTitleStrMixin, models.Model),
+            bases=(webapp.model_utils.ReturnTitleStrMixin, models.Model),
         ),
         migrations.CreateModel(
             name='TaskType',
@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=30, verbose_name='Type')),
             ],
-            bases=(webapp.utils.ReturnTitleStrMixin, models.Model),
+            bases=(webapp.model_utils.ReturnTitleStrMixin, models.Model),
         ),
         migrations.CreateModel(
             name='Task',
@@ -55,6 +55,6 @@ class Migration(migrations.Migration):
                 ('status', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='tasks_with_status', to='webapp.status', verbose_name='Status')),
                 ('task_type', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='tasks_with_type', to='webapp.tasktype', verbose_name='Type')),
             ],
-            bases=(webapp.utils.ReturnTitleStrMixin, models.Model),
+            bases=(webapp.model_utils.ReturnTitleStrMixin, models.Model),
         ),
     ]

@@ -1,5 +1,5 @@
 from django.db import models
-from .utils import ReturnTitleStrMixin
+from .model_utils import ReturnTitleStrMixin
 
 
 class Task(ReturnTitleStrMixin, models.Model):
