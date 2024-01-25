@@ -46,7 +46,7 @@
           {% csrf_token %}
           <button type="submit" class="btn btn-primary shadow-0">Take Task</button>
           </form>
-          <form action="#" method="post">
+          <form action="{% url 'delete_task' task.id %}" method="post">
               {% csrf_token %}
               <button type="submit" class="btn btn-danger shadow-0">Delete Task</button>
           </form>
@@ -55,6 +55,13 @@
               <button type="submit" class="btn btn-warning shadow-0">Reject Task</button>
           </form>
           <a href="{% url 'edit_task' task.id %}" class="btn btn-secondary shadow-0">Edit task</a>
+      </div>
+      <div class="action-errors text-center m-2">
+          {% if messages %}
+              {% for message in messages %}
+              <span class="text-danger">{{ message }}</span>
+              {% endfor %}
+          {% endif %}
       </div>
 </div>
 

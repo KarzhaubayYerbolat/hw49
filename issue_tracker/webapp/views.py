@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views import View
@@ -74,3 +75,16 @@ class TaskUpdateView(TaskFormMixin, View):
             context = self.get_custom_context()
             context['form'] = form
             return render(request, self.template, context)
+
+
+class TaskDeleteView(View):
+
+    def post(self, request, task_id):
+        task = get_object_or_404(Task, id=task_id)
+        if request.user == task.initiator or request.user.is_superuser:
+            task.delete()
+            return redirect('task_list')
+        else:
+            messages.add_message(request, messages.ERROR, "Only the initiator or superuser can delete this task")
+            return redirect(reverse('task_detail', kwargs={'task_id': task_id}))
+
