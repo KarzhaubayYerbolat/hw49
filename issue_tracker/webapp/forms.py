@@ -1,8 +1,8 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from .models import Task, TaskType
-from appuser.models import Team
+from .models import Task, TaskType, Solution
+from appuser.models import Team, AppUser
 
 
 class TaskCreateOrUpdateForm(forms.ModelForm):
@@ -29,3 +29,26 @@ class TaskCreateOrUpdateForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-control'}),
     )
 
+
+class TaskSolutionForm(forms.ModelForm):
+
+    class Meta:
+        model = Solution
+        fields = ['solution_description',]
+        widgets = {
+            'solution_description': forms.Textarea(attrs={
+                'class': 'form-control d-flex',
+                'placeholder': 'Write solution',
+                'rows': 7,
+            }),
+        }
+
+
+def create_executor_change_form(team):
+    class TaskExecutorForm(forms.Form):
+        executor = forms.ModelChoiceField(
+            queryset=AppUser.objects.filter(team=team),
+            widget=forms.Select(attrs={'class': 'form-control'},)
+
+        )
+    return TaskExecutorForm

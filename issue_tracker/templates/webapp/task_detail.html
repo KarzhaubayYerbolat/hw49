@@ -18,48 +18,104 @@
               {{ task.description }}
           </span>
       </p>
-      <div class="row">
-        <dt class="col-3">Initiator:</dt>
-        <dd class="col-9">{{ task.initiator }}</dd>
-
-        <dt class="col-3">Type:</dt>
-        <dd class="col-9">{{ task.task_type }}</dd>
-
-        <dt class="col-3">Status:</dt>
-        <dd class="col-9">{{ task.status }}</dd>
-
-        <dt class="col-3">Responsible Group:</dt>
-        <dd class="col-9">{{ task.responsible_group }}</dd>
-        <dt class="col-3">Executor:</dt>
-        {% if task.executor %}
-            <dd class="col-9">{{ task.executor }}</dd>
-        {% else %}
-            <dd class="col-9">Not assigned</dd>
+      <div class="task-block row align-items-center">
+        <div class="task-detail col-4">
+            <div class="field-group">
+                <span class="task-field-key">Initiator:</span>
+                <span class="task-field-value">{{ task.initiator }}</span>
+            </div>
+            <div class="field-group">
+                <span class="task-field-key">Type:</span>
+                <span class="task-field-value">{{ task.task_type }}</span>
+            </div>
+            <div class="field-group">
+                <span class="task-field-key">Status:</span>
+                <span class="task-field-value">{{ task.status }}</span>
+            </div>
+            <div class="field-group">
+                <span class="task-field-key">Responsible Group:</span>
+                <span class="task-field-value">{{ task.responsible_group }}</span>
+            </div>
+            <div class="field-group">
+                <span class="task-field-key">Executor:</span>
+                {% if form_executor %}
+                <form action="{% url 'set_executor' task.id %}" method="post" class="text-right">
+                    {% csrf_token %}
+                    {{ form_executor.executor }}
+                    <button type="submit" class="btn btn-primary">Change</button>
+                </form>
+                {% else %}
+                {% if task.executor %}
+                    <span class="task-field-value">{{ task.executor }}</span>
+                {% else %}
+                    <span class="task-field-value">Not assigned</span>
+                {% endif %}
+                {% endif %}
+            </div>
+            <div class="field-group">
+                <span class="task-field-key">Create:</span>
+                <span class="task-field-value">{{ task.create_datetime|date:'d.m.Y H:i' }}</span>
+            </div>
+            <div class="field-group">
+                <span class="task-field-key">Last Update:</span>
+                <span class="task-field-value">{{ task.last_update|date:'d.m.Y H:i' }}</span>
+            </div>
+            <div class="field-group">
+                <span class="task-field-key">Complete datetime:</span>
+                {% if task.complete_datetime %}
+                <span class="task-field-value">{{ task.complete_datetime|date:'d.m.Y H:i' }}</span>
+                {% else %}
+                <span class="task-field-value">Task in progress</span>
+                {% endif %}
+            </div>
+        </div>
+        {% if task.solution %}
+          <div class="task-solution-block col-8">
+              <textarea name="solution_description" cols="40" rows="7" class="form-control d-flex" id="id_solution_description" readonly="readonly">Solution: {{ task.solution.solution_description }}</textarea>
+          </div>
         {% endif %}
-        <dt class="col-3">Create:</dt>
-        <dd class="col-9">{{ task.create_datetime|date:'d.m.Y H:i' }}</dd>
-        <dt class="col-3">Last Update:</dt>
-        <dd class="col-9">{{ task.last_update|date:'d.m.Y H:i' }}</dd>
+        {% if task.executor == request.user and task.status.title == 'In Progress' %}
+        <div class="task-solution-block col-8">
+            <form action="{% url 'solve_task' task.id %}" method="post" class="d-flex">
+                {% csrf_token %}
+                {{ form_solve.solution_description }}
+                <button type="submit" class="btn btn-success d-block">Solve</button>
+            </form>
+            {% if form_solve.solution_description.errors %}
+                {% for error in form_solve.solution_description.errors %}
+                    <p class="text-danger">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+        {% endif %}
       </div>
       <div class="block-task-forms mt-3">
-          <form action="#" method="post">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-primary shadow-0">Take Task</button>
-          </form>
+          {% if request.user.team == task.responsible_group and task.executor is None and task.status.title != 'Rejected'%}
+              <form action="{% url 'take_task' task.id %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary shadow-0">Take Task</button>
+              </form>
+          {% endif %}
+          {% if request.user == task.initiator or request.user.is_superuser %}
           <form action="{% url 'delete_task' task.id %}" method="post">
               {% csrf_token %}
               <button type="submit" class="btn btn-danger shadow-0">Delete Task</button>
           </form>
-          <form action="#" method="post">
+          {% endif %}
+          {% if task.responsible_group.team_lead == request.user and task.status.title != 'Rejected' and task.status.title == 'New' %}
+          <form action="{% url 'reject_task' task.id %}" method="post">
               {% csrf_token %}
               <button type="submit" class="btn btn-warning shadow-0">Reject Task</button>
           </form>
+          {% endif %}
+          {% if task.initiator == request.user and task.status.title == 'New'%}
           <a href="{% url 'edit_task' task.id %}" class="btn btn-secondary shadow-0">Edit task</a>
+          {% endif %}
       </div>
       <div class="action-errors text-center m-2">
           {% if messages %}
               {% for message in messages %}
-              <span class="text-danger">{{ message }}</span>
+              <span class="text-danger">{{ message|linebreaks }}</span>
               {% endfor %}
           {% endif %}
       </div>

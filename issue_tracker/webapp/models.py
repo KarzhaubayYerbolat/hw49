@@ -1,5 +1,6 @@
 from django.db import models
 from .model_utils import ReturnTitleStrMixin
+from django.core.validators import MinLengthValidator, MaxLengthValidator
 
 
 class Task(ReturnTitleStrMixin, models.Model):
@@ -51,7 +52,10 @@ class Solution(models.Model):
         related_name='solution',
         null=True,
     )
-    solution_description = models.TextField(verbose_name='Solution')
+    solution_description = models.TextField(
+        verbose_name='Solution',
+        validators=[MaxLengthValidator(200), MinLengthValidator(20)]
+    )
 
     def __str__(self):
         return self.solution_description[:20]

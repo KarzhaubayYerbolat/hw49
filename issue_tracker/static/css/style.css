@@ -44,3 +44,13 @@
 .logout-link {
     color: red;
 }
+
+.field-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.task-field-key {
+    font-weight: bold;
+}
