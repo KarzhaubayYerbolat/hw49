@@ -7,8 +7,12 @@ class TaskSolutionInline(admin.StackedInline):
 
 
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('title', 'task_type', 'status', 'initiator', 'responsible_group', 'executor')
+    list_display = ('title', 'types', 'status', 'initiator', 'responsible_group', 'executor')
     inlines = (TaskSolutionInline,)
+
+    def types(self, obj):
+        types_str = ', '.join([task_type.title for task_type in obj.task_types.all()])
+        return types_str
 
 
 admin.site.register(Task, TaskAdmin)

@@ -16,11 +16,10 @@ class Task(ReturnTitleStrMixin, models.Model):
         related_name='tasks_with_status',
 
     )
-    task_type = models.ForeignKey(
+    task_types = models.ManyToManyField(
         'webapp.TaskType',
-        on_delete=models.PROTECT,
-        verbose_name='Type',
         related_name='tasks_with_type',
+        blank=True
     )
     initiator = models.ForeignKey(
         'appuser.AppUser',
