@@ -42,6 +42,11 @@ class Task(ReturnTitleStrMixin, models.Model):
         blank=True
     )
 
+    @property
+    def types(self):
+        types_str = ', '.join([task_type.title for task_type in self.task_types.all()])
+        return types_str
+
 
 class Solution(models.Model):
     task = models.OneToOneField(

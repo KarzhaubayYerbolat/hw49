@@ -6,7 +6,7 @@ from django.views import View
 from django.views.generic import TemplateView
 from .models import Task, Status
 from .forms import TaskCreateOrUpdateForm, TaskSolutionForm, create_executor_change_form
-from .utils import TaskFormMixin
+from .utils import TaskFormMixin, CanEditTaskCheckMixin
 
 
 class TaskListView(TemplateView):
@@ -42,8 +42,7 @@ class TaskDetailView(TemplateView):
         if task.executor == self.request.user:
             context['form_solve'] = TaskSolutionForm()
 
-        if task.responsible_group.team_lead == self.request.user and task.status.title != 'Rejected':
-
+        if task.responsible_group.team_lead == self.request.user and task.status.title == 'New':
             context['form_executor'] = create_executor_change_form(task.responsible_group)(data={
                 'executor': task.executor
             })
@@ -62,6 +61,7 @@ class TaskCreateView(TaskFormMixin, View):
             obj.initiator = self.request.user
             obj.status = Status.objects.get(title='New')
             obj.save()
+            form.save_m2m()
             return redirect(reverse('task_detail', kwargs={'task_id': obj.id}))
 
         else:
@@ -70,12 +70,12 @@ class TaskCreateView(TaskFormMixin, View):
             return render(request, self.template, context)
 
 
-class TaskUpdateView(TaskFormMixin, View):
+class TaskUpdateView(CanEditTaskCheckMixin, TaskFormMixin, View):
     action = 'Update'
 
     def post(self, request, task_id):
         task = get_object_or_404(self.model, id=task_id)
-        if task.initiator == request.user and task.status.title == 'New':
+        if self.check_permissions(request, task):
             form = TaskCreateOrUpdateForm(request.POST, instance=task)
             if form.is_valid():
                 form.save()
@@ -85,67 +85,51 @@ class TaskUpdateView(TaskFormMixin, View):
                 context = self.get_custom_context()
                 context['form'] = form
                 return render(request, self.template, context)
-        else:
-            message = 'Only the initiator or superuser can edit this task and task status should be New'
-            messages.add_message(request, messages.ERROR, message)
-            return redirect(reverse('task_detail', kwargs={'task_id': task_id}))
 
 
-class TaskDeleteView(View):
+class TaskDeleteView(CanEditTaskCheckMixin, View):
+    action = 'Delete'
 
     def post(self, request, task_id):
         task = get_object_or_404(Task, id=task_id)
-        if request.user == task.initiator or request.user.is_superuser:
+        if self.check_permissions(request, task):
             task.delete()
             return redirect('task_list')
-        else:
-            message = 'Only the initiator or superuser can delete this task'
-            messages.add_message(request, messages.ERROR, message)
-            return redirect(reverse('task_detail', kwargs={'task_id': task_id}))
 
 
-class TaskTakeView(View):
+class TaskTakeView(CanEditTaskCheckMixin, View):
+    action = 'Take'
 
     def post(self, request, task_id):
         task = get_object_or_404(Task, id=task_id)
 
-        if request.user.team == task.responsible_group and task.executor is None and task.status.title != 'Rejected':
+        if self.check_permissions(request, task):
             task.status = Status.objects.get(title='In Progress')
             task.executor = request.user
             task.save()
-
-        else:
-            message = ('You cannot take this task for the following possible reasons:\n'
-                       '1)This task already has an executor;\n'
-                       '2)You are not a member of the responsible team for this assignment;\n'
-                       '3)This task has been rejected;\n')
-            messages.add_message(request, messages.ERROR, message)
-
-        return redirect(reverse('task_detail', kwargs={'task_id': task_id}))
+            return redirect(reverse('task_detail', kwargs={'task_id': task_id}))
 
 
-class RejectTaskView(View):
+class RejectTaskView(CanEditTaskCheckMixin, View):
+    action = 'Reject'
+
     def post(self, request, task_id):
         task = get_object_or_404(Task, id=task_id)
 
-        if task.responsible_group.team_lead == request.user and task.status.title != 'Rejected':
+        if self.check_permissions(request, task):
             task.status = Status.objects.get(title='Rejected')
             task.executor = None
             task.save()
 
-        else:
-            message = ('You cannot reject this assignment for the following reasons:\n'
-                       '1)You are not the team leader of the group responsible for this task;\n'
-                       '2)The task is already rejected;\n')
-            messages.add_message(request, messages.ERROR, message)
-
-        return redirect(reverse('task_detail', kwargs={'task_id': task_id}))
+            return redirect(reverse('task_detail', kwargs={'task_id': task_id}))
 
 
-class TaskSolveView(View):
+class TaskSolveView(CanEditTaskCheckMixin, View):
+    action = 'Solve'
+
     def post(self, request, task_id):
         task = get_object_or_404(Task, id=task_id)
-        if request.user == task.executor:
+        if self.check_permissions(request, task):
             form = TaskSolutionForm(request.POST)
             if form.is_valid():
                 obj = form.save(commit=False)
@@ -160,11 +144,13 @@ class TaskSolveView(View):
             return redirect(reverse('task_detail', kwargs={'task_id': task_id}))
 
 
-class ChangeTaskExecutorView(View):
+class ChangeTaskExecutorView(CanEditTaskCheckMixin, View):
+    action = 'ChangeExecutor'
+
     def post(self, request, task_id):
         task = get_object_or_404(Task, id=task_id)
 
-        if request.user == task.responsible_group.team_lead:
+        if self.check_permissions(request, task):
             form = create_executor_change_form(request.user.team)(self.request.POST)
             if form.is_valid():
                 task.executor = form.cleaned_data['executor']
@@ -174,7 +160,3 @@ class ChangeTaskExecutorView(View):
             else:
                 messages.add_message(request, messages.ERROR, form.errors)
             return redirect(reverse('task_detail', kwargs={'task_id': task_id}))
-
-        else:
-            message = 'Only team leader of responsible group can change executor'
-            messages.add_message(request, messages.ERROR, message)

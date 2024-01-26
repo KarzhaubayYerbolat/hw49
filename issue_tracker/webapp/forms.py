@@ -12,7 +12,7 @@ class TaskCreateOrUpdateForm(forms.ModelForm):
         fields = [
             'title',
             'description',
-            'task_type',
+            'task_types',
             'responsible_group',
         ]
         widgets = {
@@ -20,9 +20,9 @@ class TaskCreateOrUpdateForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control'}),
         }
 
-    task_type = forms.ModelChoiceField(
+    task_types = forms.ModelMultipleChoiceField(
         queryset=TaskType.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control'}),
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
     )
     responsible_group = forms.ModelChoiceField(
         queryset=Team.objects.all(),

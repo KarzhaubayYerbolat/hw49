@@ -26,7 +26,7 @@
             </div>
             <div class="field-group">
                 <span class="task-field-key">Type:</span>
-                <span class="task-field-value">{{ task.task_type }}</span>
+                <span class="task-field-value">{{ task.types }}</span>
             </div>
             <div class="field-group">
                 <span class="task-field-key">Status:</span>
@@ -65,7 +65,7 @@
                 {% if task.complete_datetime %}
                 <span class="task-field-value">{{ task.complete_datetime|date:'d.m.Y H:i' }}</span>
                 {% else %}
-                <span class="task-field-value">Task in progress</span>
+                <span class="task-field-value">Task {{task.status}}</span>
                 {% endif %}
             </div>
         </div>
