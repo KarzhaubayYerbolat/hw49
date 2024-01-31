@@ -23,8 +23,8 @@ class TaskFormMixin:
             context['form_action'] = '/tasks/new/'
             context['form'] = self.form()
         if self.action == 'Update':
-            context['form_action'] = f'/tasks/edit/{kwargs['task_id']}'
-            task = get_object_or_404(self.model, id=kwargs['task_id'])
+            context['form_action'] = f'/tasks/edit/{kwargs["task_id"]}'
+            task = get_object_or_404(self.model, id=kwargs["task_id"])
             context['form'] = self.form(instance=task)
         return context
 
@@ -47,7 +47,7 @@ class CanEditTaskCheckMixin:
     }
 
     def check_permissions(self, request, task):
-        if self.action =='Update' and task.initiator == request.user and task.status.title == 'New':
+        if self.action == 'Update' and task.initiator == request.user and task.status.title == 'New':
             return True
 
         elif self.action == 'Delete' and request.user == task.initiator or request.user.is_superuser:
